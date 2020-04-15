@@ -182,10 +182,6 @@ property :disable_performance_standby, [true, false],
          default: false,
          description: 'Specifies whether performance standbys should be disabled on this node. Setting this to true on one Vault node will disable this feature when this node is Active or Standby. It\'s recomended to sync this setting across all nodes in the cluster.'
 
-property :disable_performance_standby, [true, false],
-         default: false,
-         description: 'Specifies whether performance standbys should be disabled on this node. Setting this to true on one Vault node will disable this feature when this node is Active or Standby. It\'s recomended to sync this setting across all nodes in the cluster.'
-
 property :sensitive, [true, false],
          default: false,
          description: 'Ensure that sensitive resource data is not logged by Chef Infra Client.'
@@ -214,7 +210,7 @@ action :install do
     url new_resource.url
     version new_resource.version
     checksum new_resource.checksum unless new_resource.checksum.nil?
-    prefix_root '/opt/vault'
+    prefix_root new_resource.install_location
     has_binaries ['vault']
     prefix_bin '/usr/local/bin'
     strip_components 0
@@ -307,7 +303,7 @@ action :remove do
     only_if 'test -L /usr/local/bin/vault'
   end
 
-  directory "/opt/vault/vault-#{new_resource.version}" do
+  directory "#{new_resource.install_location}/vault-#{new_resource.version}" do
     action :delete
   end
 
